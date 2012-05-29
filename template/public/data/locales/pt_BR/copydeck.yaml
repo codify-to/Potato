@@ -1,0 +1,28 @@
+# This is an example I18n locale file in YAML format
+# Author: Fernando França
+# Since: 02.08.2010
+
+# In Potato, you can use the I18n helper function "_". 
+# For example, use _("title") to display the content define below.
+title: My Application
+
+# Most of the time, quotation marks are optional in YAML
+subtitle: "The greatest application the world has ever seen"
+
+# Beautiful HTML syntax without escaping or dreaded CDATA tags ^^
+my_html: <p>This is a <b>bold</b> statement!</p>
+
+# Dynamic string to be subtituted with the printf function
+# Notice the substitution symbols %(product)s and %(cost)s
+dynamic_example: "Do you want to <b>buy a %(product)s</b>? Buy it today for only <b>US$ %(cost)s</b>!" 
+
+# Example of multiline YAML, starting with a pipe (" | ")
+multiline_example: |
+  First line with introductory text, followed
+  by a second Line, maybe we should add
+  a third line just to be certain multiline fields work.
+
+# Fill with locale - MATCH_BY_TEXT
+custom_section_title: My Custom Section
+
+custom_section_subtitle: And here is my subtitle

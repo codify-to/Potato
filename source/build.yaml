@@ -1,0 +1,66 @@
+---
+default:
+  - debug: false
+    # open: public/Main.swf
+    # extras: -use-network=false -static-link-runtime-shared-libraries
+  
+# applications:
+#     - class: source/classes/Main.as
+#       output: public/Main.swf
+
+components:
+  - output: potato.swc
+    classes:
+      - classes
+    # extras:
+      
+  # - output: potato_full.swc
+  #   classes:
+  #     - classes
+  #     - libs
+
+library-path:
+  #  - swc
+
+source-path:
+    - classes
+    # - classes/potato/core
+    # - classes/potato/control
+    # - classes/potato/debug
+    # - classes/potato/display
+    # - classes/potato/utils
+    # - classes/potato/modules/dependencies
+    # - classes/potato/modules/i18n
+    # - classes/potato/modules/log
+    # - classes/potato/modules/media
+    # - classes/potato/modules/navigation
+    # - classes/potato/modules/parameters
+    # - classes/potato/modules/services
+    # - classes/potato/modules/tracking
+    - libs
+
+asdoc:
+    - title: "Potato API Documentation"
+      footer: "Licensed under the MIT License. http://gringo-nu.github.com/Potato/"
+      output: ../docs/
+      exclude-dirs:
+        - libs/
+              
+      packages:
+        - potato.control:                    "Control structures for core interfaces."
+        - potato.core:                       "Core interfaces."
+        - potato.core.config:                "Configuration object interface and implementations."
+        - potato.debug:                      "Debugging methods and utilities."
+        - potato.display:                    "Structures and methods that mimetize the flash.display package."
+        - potato.modules.media:              "Media managers with audio and video support."
+        - potato.utils:                      "Common utility methods."
+        - potato.modules.dependencies:       "Defines and implements dependencies used by the navigation module."
+        - potato.modules.i18n:               "Internationalization support."
+        - potato.modules.log:                "Custom logging mechanisms."
+        - potato.modules.navigation:         "Implements View navigation."
+        - potato.modules.navigation.presets: "View presets with extra modules and configuration types included." 
+        - potato.modules.parameters:         "Parameters with built-in value substitution and defaults."
+        - potato.modules.services:           "Services management with modular parsers and encoders."
+        - potato.modules.tracking:           "Configurable tracking mechanism."
+        
+      extras: -warnings=false -left-frameset-width=250

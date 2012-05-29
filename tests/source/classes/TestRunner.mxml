@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	creationComplete="runMe()" xmlns:flexUnitUIRunner="http://www.adobe.com/2009/flexUnitUIRunner" 
+    width="1024" height="700" styleName="flexUnitApplication" >
+	
+	<mx:Script>
+		<![CDATA[
+			import org.flexunit.assertThat;
+			import org.flexunit.asserts.*;
+			import org.flexunit.listeners.UIListener;
+			import org.flexunit.internals.TraceListener;
+			import org.flexunit.runner.FlexUnitCore;
+            import potato.core.config.YAMLConfigTest;
+            import potato.modules.parameters.ParametersTest;
+            import potato.modules.dependencies.DependenciesTest;
+			
+			private var core:FlexUnitCore;
+
+			public function runMe():void {
+
+				core = new FlexUnitCore();
+
+				//Listener for outputting to the trace console via the trace method, ActionScript or Flex
+				core.addListener( new TraceListener() );
+
+				//Listener for the UI
+				core.addListener( new UIListener( uiListener ));
+				
+				//This run statements executes the unit tests for the FlexUnit4 framework 
+				//the Hamcrest matchers and some of the tests shown in the FlexUnit in 360 seconds blog post
+				core.run( ParametersTest, DependenciesTest, YAMLConfigTest );
+				
+			}
+		]]>
+	</mx:Script>
+
+	<flexUnitUIRunner:TestRunnerBase id="uiListener" 
+		width="100%" height="100%" />	
+</mx:Application>

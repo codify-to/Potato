@@ -1,0 +1,268 @@
+#Requires
+%w(rubygems rake webrick net/http fileutils daemons).each {|lib| require lib}
+
+@config = {
+        #Files to compile
+        :targets => {
+          "source/classes/TestRunner.mxml"   => "public/TestRunner.swf",
+          "source/classes/Dummy.as"   => "public/Dummy.swf"
+        },
+        #
+        #SWCs
+        :library_path => [
+            "source/swc"
+        ],
+        #
+        #Source files
+        :source_path => [
+            "source/classes",
+            "../source/libs",
+            "../source/classes"
+        ],
+        #
+        #Exclude classes
+        :link_report => {},
+        #
+        #Debug symbols
+        :debug        => true,
+        #
+        #File to open
+        :open => "public/TestRunner.swf",
+        #
+        #extra options
+        :extras        => "-use-network=false"
+}
+
+
+#Default task
+task :default => [ :build ]
+
+desc "Build"
+task :build do 
+  command = "fcshd build "
+  which = []
+  @config[:targets].each { |k,v|
+    which << get_compile_line(k, v)
+  }
+
+  server = FCSHDServer.new
+  begin
+          server.build which 
+  rescue Errno::ECONNREFUSED
+          puts "Server is down... starting it up, run this command again" 
+          server.daemon
+  end
+end
+
+desc "Opens default file and tail the flashlog"
+task :open do
+
+  open = File.join(current_path, @config[:open])
+  open = @config[:open] unless File.file? open
+  system "open '#{open}'"
+
+  filename = File.expand_path('~/Library/Preferences/Macromedia/Flash Player/Logs/flashlog.txt')
+  system("tail -f '#{filename}'")
+
+end
+
+desc "Removes all built files"
+task :clean do
+
+        @config[:targets].each_value do |v|
+            puts "cleaning #{v}"
+            FileUtils.rm_rf v
+        end
+ 
+end
+
+desc "Stops the fcsh server"
+task :stop_server do 
+        FCSHDServer.new.stop
+end
+desc "Starts the FCSH server"
+task :start_server do 
+        FCSHDServer.new.daemon
+end
+
+def get_compile_line(input, output)
+
+	libs_path    = @config[:library_path].map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
+	sources_path = @config[:source_path].map{ |lib| "-sp+=#{escape(File.join(current_path, lib))}"}.join(" ")
+
+    #Making sure the link report folder exists
+    link_report_file = File.join("/tmp", input)
+    FileUtils.mkdir_p File.dirname(link_report_file)
+
+	line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{@config[:debug]} #{libs_path} #{sources_path} #{@config[:extras]} -link-report=#{escape(link_report_file)} -static-link-runtime-shared-libraries"
+
+    #Excluding some clases
+    @config[:link_report][input].each do |l|
+        line += " -load-externs=/tmp/#{l}"
+    end unless @config[:link_report][input].nil?
+    #puts line
+
+    line
+end
+
+def current_path
+  File.dirname __FILE__
+end
+
+def escape path
+    path.gsub ' ', '\ '
+end
+
+
+
+
+
+
+
+class FCSHDServer
+        PORT = 6924
+        HOST = "localhost"
+
+        ASSIGNED_REGEXP = /^ fcsh: Assigned (\d+) as the compile target id/
+
+        attr_accessor :commands
+
+        def start
+        
+                #remembering wich swfs we asked for compiling
+                @commands ||= Hash.new
+
+            fcsh = IO.popen("fcsh  2>&1", "w+")
+            read_to_prompt(fcsh)
+
+            #Creating the HTTP Server  
+            s = WEBrick::HTTPServer.new(
+                :Port => PORT,
+                :Logger => WEBrick::Log.new(nil, WEBrick::BasicLog::WARN),
+                :AccessLog => []
+            )
+
+            #giving it an action
+            s.mount_proc("/build"){|req, res|
+
+                #response variable
+                output = ""
+
+                #Searching for an id for this command
+                if @commands.has_key?(req.body)
+                    # Exists, incremental
+                    fcsh.puts "compile #{@commands[req.body]}"
+                    output = read_to_prompt(fcsh)
+                else
+                    # Does not exist, compile for the first time
+                    fcsh.puts req.body
+                    output = read_to_prompt(fcsh)
+                    @commands[req.body] = $1 if output.match(ASSIGNED_REGEXP)
+                end
+
+                res.body = output
+                res['Content-Type'] = "text/html"
+            }
+
+            s.mount_proc("/stop"){|req, res|
+                s.shutdown
+                fcsh.close
+                exit
+            }
+
+            trap("INT"){
+                s.shutdown 
+                fcsh.close
+            }
+
+            #Starting webrick
+            puts "\nStarting Webrick at http://#{HOST}:#{PORT}"
+            s.start
+
+            # #Do not show error if we're trying to start the server more than once
+            # if e.message =~ /Address already in use/ < 0
+            #   puts e.message
+            # end
+
+        end
+ 
+        def daemon
+            Daemons.daemonize
+            start
+        end
+
+        def build(which)
+            which.each{ |arg|
+                    http = Net::HTTP.new(HOST, PORT)
+                    resp, date = http.post('/build', arg)
+                    puts resp.body
+             }
+        end
+
+        def stop
+                http = Net::HTTP.new(HOST, PORT)
+                resp, date = http.get('/stop')
+                puts resp.body
+        end
+
+
+        ############################################
+        # If a parameter was provided, take action #
+        ############################################
+
+        def init
+            begin
+                case ARGV.first
+                    #Starts the server
+                when "server"
+                    start
+
+                    #Starts server as a daemon
+                when "daemon"
+                    daemon
+                    #Build
+                when "build"
+                        build ARGV.shift
+                        exit
+
+                #Tells server to exit
+                when "exit"
+                        stop
+                        exit
+                end
+
+                # When asking for the server and it refuses the connection
+                # mainly it's because the service is down
+                # soooooo... let's start it!
+            rescue Errno::ECONNREFUSED
+
+                exit(1) if ARGV[0] == "exit"
+
+                puts "Server is down... starting it up, run this command again"
+                daemon
+
+                #Other errors
+            rescue => e
+                puts "Invalid command: #{e}"
+                exit(1)
+            end
+        end
+
+        private
+        #Helper method to read the output
+        def read_to_prompt(f)
+            f.flush
+            output = ""
+            while chunk = f.read(1)
+                STDOUT.write chunk
+                output << chunk
+                if output =~ /^\(fcsh\)/
+                    break
+                end
+            end
+            STDOUT.write ">"
+            output
+        end
+
+
+end

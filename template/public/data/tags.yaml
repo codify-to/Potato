@@ -1,0 +1,7 @@
+# Idented YAML for tracking
+# Example for Google Analytics
+loading         : "['_trackPageview', 'loading']"
+privacy         : "['_trackPageview', 'privacy/open']"
+play            : "['_trackEvent', 'Player', 'Play']"
+share_twitter   : "['_trackEvent', 'Share', 'Twitter']"
+share_facebook  : "['_trackEvent', 'Share', 'Facebook']"

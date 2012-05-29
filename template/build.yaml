@@ -1,0 +1,28 @@
+---
+default:
+    - debug: true
+      open: public/index-debug.html
+      extras: -use-network=false -static-link-runtime-shared-libraries
+    
+library-path:
+    - source/swc
+
+source-path:
+    - source/libs
+    - source/classes
+    
+applications:
+    - class: source/classes/{project_name}_loader.as
+      output: public/{project_name}_loader.swf
+      
+    - class: source/classes/{project_name}_main.as
+      output: public/{project_name}_main.swf
+      exclude:
+        - source/classes/{project_name}_loader.as
+# asdoc:
+#     title: "My ActionScript project"
+#     footer: "My ActionScript project footer"
+#     output: docs/
+#     exclude-dirs: 
+#       - source/classes/com/greensock/
+#       - source/classes/br/com/stimuli/

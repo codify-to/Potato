@@ -1,0 +1,14 @@
+# Loader
+id: loader
+parameters:
+  locale: pt_BR
+
+views:
+  # Main
+  - id: main
+    zIndex: 1
+    class: {project_name}.views.MainView
+    localeFile: "%(localePath)s/copydeck.yaml"
+    dependencies:
+      - url: "%(basePath)s/{project_name}_main.swf"
+        domain: current
