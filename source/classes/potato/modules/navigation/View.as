@@ -183,6 +183,9 @@ package potato.modules.navigation
 		 */
 		potato_navigation function _dispose():void
 		{
+			//Call DisposableSprite implementation
+			super.dispose();
+			
 			//Call user dispose implementation
 			dispose();
 			
