@@ -1,5 +1,6 @@
 package potato.modules.i18n
 {
+	import flash.text.TextFieldType;
 	import flash.text.TextField;
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
@@ -51,9 +52,13 @@ package potato.modules.i18n
 	   * @private
 	   */
 		public static function matchByText(e:TextField):String {
-			if (e.text.charAt(0) == "{" && e.text.charAt(e.text.length -1) == "}")
-				return e.text.substr(1, e.text.length - 2);
-			return null;
+			var matches:Object = /{(.*)}/.exec(e.text);
+
+			//Nothing found
+			if (!matches) return null;
+			
+			//
+			return matches[1];
 		}
 	
 	  /**
@@ -101,22 +106,22 @@ package potato.modules.i18n
 				if(maxDepth <= 0) return;
 				
 				//Check if it's a TextField
-				if (where is TextField)
+				if (where is TextField && ((where as TextField).type == TextFieldType.DYNAMIC || (where as TextField).type == TextFieldType.INPUT))
 				{
 					//Get the id from the miner function
 					var id:String = miner.apply(where, [where].concat(rest));
 					
 					//Check if it exists in the list
-					if (strings[id]){
-					  var t:TextField = where as TextField;
-					  t.text = strings[id];
-					  var fmt:TextFormat = t.getTextFormat();
-            t.setTextFormat(fmt);
-            t.autoSize = t.autoSize;
-					}
-						
-					else
-						log("ID NOT FOUND:", id)
+					if(id)
+						if (strings[id]){
+							var t:TextField = where as TextField;
+							t.text = strings[id];
+							var fmt:TextFormat = t.getTextFormat();
+							t.setTextFormat(fmt);
+							t.autoSize = t.autoSize;
+						}
+						else
+							log("ID NOT FOUND:", id)
 
 				} 
 				//No let's loop through the children

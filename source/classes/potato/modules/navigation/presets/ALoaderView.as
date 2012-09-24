@@ -39,6 +39,7 @@ package potato.modules.navigation.presets
       if(stage){
         stage.align = StageAlign.TOP_LEFT;
         stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.stageFocusRect = false;
       }
 
       //Setting default parameters
@@ -64,6 +65,7 @@ package potato.modules.navigation.presets
       parameters.defaults.tagsFile   = "%(basePath)s/data/tags.%(defaultExtension)s";
       parameters.defaults.locale     = "pt_BR";
       parameters.defaults.localePath = "%(basePath)s/data/locales/%(locale)s";
+      parameters.defaults.automaticLocale = true;
     }
 
   }

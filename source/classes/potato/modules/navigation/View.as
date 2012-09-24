@@ -1,5 +1,7 @@
 package potato.modules.navigation
 {
+	import potato.modules.i18n.I18nMatch;
+	import potato.modules.i18n.fillWithLocale;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	
@@ -163,8 +165,11 @@ package potato.modules.navigation
 			//User implementation
 			init();
 			
-			//Position all stuff
+			//Positioning all stuff
 			resize();
+
+			//i18n
+			if(parameters.automaticLocale) fillWithLocale(this);
 		}
 		
 		/**
@@ -183,6 +188,9 @@ package potato.modules.navigation
 		 */
 		potato_navigation function _dispose():void
 		{
+			//Call DisposableSprite implementation
+			super.dispose();
+			
 			//Call user dispose implementation
 			dispose();
 			
