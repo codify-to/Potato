@@ -113,9 +113,9 @@ package potato.modules.i18n
 					
 					//Check if it exists in the list
 					if(id)
-						if (strings[id]){
+						if (strings[id.toLowerCase()]){
 							var t:TextField = where as TextField;
-							t.text = strings[id];
+							t.htmlText = strings[id.toLowerCase()];
 							var fmt:TextFormat = t.getTextFormat();
 							t.setTextFormat(fmt);
 							t.autoSize = t.autoSize;
