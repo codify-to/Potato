@@ -1,5 +1,6 @@
 package potato.modules.navigation
 {
+	import potato.modules.services.ServiceManager;
 	import potato.modules.i18n.I18nMatch;
 	import potato.modules.i18n.fillWithLocale;
 	import flash.display.Sprite;
@@ -106,6 +107,10 @@ package potato.modules.navigation
 			// Configure parameters if they have been defined
 			if(_config.hasProperty("parameters"))
 				parameters.inject(_config.configForKey("parameters"));
+
+			// Configure services if they have been defined
+			if(_config.hasProperty("services"))
+				ServiceManager.instance.registerServicesByConfig(_config.configForKey("services"), parameters);
 			
 			// Creating the navigation controller to add, remove or change views
 			nav = new NavigationController(_config.hasProperty("views") ? _config.getProperty("views") : null, this, parameters);
