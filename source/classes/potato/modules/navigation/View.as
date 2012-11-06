@@ -295,16 +295,9 @@ package potato.modules.navigation
 		public function get parameters():Parameters
 		{
 			if(!_parameters)
-				_parameters = new Parameters()
+				_parameters = Parameters.instance;
 			
 			return _parameters;
-		}
-		/**
-		 * Used by parent view to override the parameters
-		 */
-		public function set parameters(value:Parameters):void
-		{
-			_parameters = value;
 		}
 		
 		/**

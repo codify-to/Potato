@@ -52,9 +52,9 @@ package potato.modules.parameters
 		/**
 		 * @constructor
 		 */
-		public function Parameters(config:Config=null)
+		public function Parameters(singleton:SingletonEnforcer)
 		{
-			_parameters = config ? config : new Config();
+			_parameters = new Config();
 			_parameters.init();
 			
 			_defaults = new Dictionary();
@@ -181,6 +181,20 @@ package potato.modules.parameters
 			_allKeys = null;
 			_defaults = null;
 		}
+
+		private static var __instance:Parameters;
+		
+		public static function get instance():Parameters
+		{
+			if(!__instance)
+				__instance = new Parameters(new SingletonEnforcer());
+			return __instance;
+		}
 	}
 
 }
+
+/**
+ * Enforces the Singleton design pattern.
+ */
+internal class SingletonEnforcer{}
