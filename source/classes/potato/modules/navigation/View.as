@@ -1,6 +1,7 @@
 package potato.modules.navigation
 {
 	import potato.modules.services.ServiceManager;
+	import potato.modules.parameters.Parameters;
 	import potato.modules.i18n.I18nMatch;
 	import potato.modules.i18n.fillWithLocale;
 	import flash.display.Sprite;
@@ -58,7 +59,7 @@ package potato.modules.navigation
 		
 		// The following variables use a decoupled behavior
 		// (dependencies and parameters modules are not included by default)
-		protected var _parameters:Object;
+		protected var _parameters:Parameters;
 		protected var _dependencies:IDependencies;
 		protected var _config:Config;
 		
@@ -291,17 +292,17 @@ package potato.modules.navigation
 		 * Otherwise, a <code>potato.modules.parameters.Parameters</code> instance is returned
 		 * (automatically created if needed)
 		 */
-		public function get parameters():Object
+		public function get parameters():Parameters
 		{
 			if(!_parameters)
-				_parameters = getInstanceByName("potato.modules.parameters.Parameters");
+				_parameters = new Parameters()
 			
 			return _parameters;
 		}
 		/**
 		 * Used by parent view to override the parameters
 		 */
-		public function set parameters(value:Object):void
+		public function set parameters(value:Parameters):void
 		{
 			_parameters = value;
 		}

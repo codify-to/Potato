@@ -1,5 +1,6 @@
 package potato.modules.navigation
 {
+	import potato.modules.parameters.Parameters;
 	import flash.events.Event;
 	import flash.utils.Dictionary;
 	import potato.modules.navigation.events.NavigationEvent;
@@ -176,7 +177,7 @@ package potato.modules.navigation
 		
 			//Add parameters inheritance
 			if(loadedView.parameters)
-				loadedView.parameters.inherit = _interpolationValues;
+				loadedView.parameters.inherit = _interpolationValues as Parameters;
 				
 			//Set the parent of the loaded view
 			//loadedView.nav.parent = currentView;
