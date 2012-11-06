@@ -1,5 +1,7 @@
 package potato.modules.services
 {
+	import potato.modules.parameters.Parameters;
+	import potato.core.config.Config;
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import potato.modules.services.ServiceEvent;
@@ -30,10 +32,11 @@ package potato.modules.services
 			_registeredEncoders = new Dictionary();
 		}
 		
-		public function registerServicesByConfig(parameters:Object):void
+		public function registerServicesByConfig(services:Config, parameters:Parameters):void
 		{
-			for each(var serviceConfig:* in parameters.services)
+			for each(var serviceKey:String in services.keys)
 			{
+				var serviceConfig:* = services.getProperty(serviceKey);
 				var serviceID:String = serviceConfig.id;
 				var serviceURL:String = printf(serviceConfig.url, parameters);
 				var serviceParser:IResponseParser = getParserByID(serviceConfig.parser);
