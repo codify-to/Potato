@@ -19,7 +19,7 @@ package potato.modules.services
 		protected var _retries:int;
 		protected var _requestMethod:String;
 		
-		public function Service(id:String, url:String, parser:IResponseParser, encoder:ICallEncoder, requestMethod:String, timeout:Number = 10000, retries:int = 3)
+		public function Service(id:String, url:String, parser:IResponseParser, encoder:ICallEncoder, requestMethod:String, timeout:Number = 120000, retries:int = 0)
 		{
 		  _id = id;
 			_url = url;
