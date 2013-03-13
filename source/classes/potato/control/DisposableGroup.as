@@ -21,15 +21,18 @@ package potato.control
 		{
 			_elements = new Vector.<IDisposable>();
 		}
+
+		public function disposeElements():void
+		{
+			for each(var obj:IDisposable in _elements){
+				obj.dispose();
+			}
+			_elements.length = 0;
+		}
 		
 		public function dispose():void
 		{
-			var obj:IDisposable;
-			for each(obj in _elements){
-				obj.dispose();
-			}
-			
-			_elements.length = 0;
+			disposeElements();
 			_elements = null;
 		}
 		
