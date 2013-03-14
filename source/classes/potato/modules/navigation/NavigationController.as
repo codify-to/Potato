@@ -299,7 +299,7 @@ package potato.modules.navigation
 			//Make theses views available to the messenger
 			for each (v in _viewsToShow)
 			{
-			  //Remove from queue
+				//Remove from queue
 				viewsLoaded.splice(viewsLoaded.indexOf(v), 1);
 				
 				//Add to the list of views
@@ -317,14 +317,14 @@ package potato.modules.navigation
 				{					
 					//Prepare to hide
 					v.addEventListener(NavigationEvent.VIEW_HIDDEN, onViewHidden);
-			
-			        //Remove from list
-			        _viewsToHide.splice(_viewsToHide.indexOf(v),1);
-					
+
 					//Hide
 					v.hide();
 				}
-			} else
+				//Clear the list
+				_viewsToHide.length = 0;
+			}
+			else
 			{
 				continueTransition();
 			}
