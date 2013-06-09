@@ -35,8 +35,8 @@ package potato.modules.parameters
 	 */
 	dynamic public class Parameters extends Proxy implements IDisposable
 	{
-	  //Inheritance
-		public var inherit:Parameters;
+	  	//Inheritance
+		//public var inherit:Parameters;
 	  
 		/** @private */
 		protected var _parameters:Config;
@@ -68,10 +68,10 @@ package potato.modules.parameters
 			var val:* = _parameters.hasProperty(name) ? _parameters.getProperty(name) : _defaults[name];
 			
 			//None found, trying to get inherited
-			if(val == undefined && inherit)
-			{
-				val = inherit[name];
-			}
+			//if(val == undefined && inherit)
+			//{
+			//	val = inherit[name];
+			//}
 				
 				
 			if (val is String)
@@ -95,6 +95,14 @@ package potato.modules.parameters
 			_parameters.setProperty(name, value);
 			
 			return;
+		}
+
+		/**
+		 * Check if the config has this key
+		 */
+		override flash_proxy function hasProperty(name:*):Boolean
+		{
+			return _parameters.hasProperty(name);
 		}
 		
 		/**

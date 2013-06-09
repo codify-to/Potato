@@ -28,6 +28,7 @@ package potato.modules.services
 	{
 		protected var _service:Service;
 		protected var _parameters:Object;
+		protected var _urlParameters:Object;
 		protected var _content:Object;
 		protected var _rawContent:String;
 		protected var _urlLoader:URLLoader;
@@ -40,6 +41,7 @@ package potato.modules.services
 		{
 			_service = service;
 			_parameters = parameters;
+			_urlParameters = urlParameters;
 		}
 		
 		public function get service():Service
@@ -67,7 +69,7 @@ package potato.modules.services
       _urlLoader.addEventListener(HTTPStatusEvent.HTTP_STATUS, onHttpStatus);
       _urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
       
-			_urlRequest = new URLRequest(printf(_service.url, _parameters));
+			_urlRequest = new URLRequest(printf(_service.url, _urlParameters));
 			
 			if(_parameters)
 			{
