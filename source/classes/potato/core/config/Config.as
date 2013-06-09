@@ -72,7 +72,7 @@ package potato.core.config
 			for each (var prop:Object in props)
 			{
 				lastVal = getPropertyValue(lastVal[prop]);
-				if(!lastVal) return false;
+				if(lastVal == null) return false;
 			}
 
 			return true;

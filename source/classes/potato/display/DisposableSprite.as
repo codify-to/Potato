@@ -14,20 +14,31 @@ package potato.display
 	 * @playerversion Flash 10.0.0
 	 * 
 	 * @author Fernando França
-	 * @since  30.07.2010
+	 * @since	30.07.2010
 	 */
 	public class DisposableSprite extends Sprite implements IDisposable
 	{
-	  /** @private */
+		/** @private */
 		protected var _disposableChildren:DisposableGroup;
 		
 		/** @private */
 		protected var _removableChildren:Vector.<DisplayObject>;
-	  
+		
 		public function DisposableSprite()
 		{
 			_disposableChildren = new DisposableGroup();
 			_removableChildren = new Vector.<DisplayObject>();
+		}
+
+		public function disposeChildren():void
+		{
+			_disposableChildren.disposeElements();
+			
+			for each(var displayObject:DisplayObject in _removableChildren)
+			{
+				safeRemoveChild(displayObject);
+			}
+			_removableChildren.length = 0;
 		}
 		
 		/**
@@ -38,13 +49,13 @@ package potato.display
 			if(_disposableChildren == null) return;
 			
 			_disposableChildren.dispose();
-			_disposableChildren = null
+			_disposableChildren = null;
 			
 			for each(var displayObject:DisplayObject in _removableChildren)
 			{
-			  safeRemoveChild(displayObject);
+				safeRemoveChild(displayObject);
 			}
-			
+			_removableChildren.length = 0;	
 			_removableChildren = null;
 		}
 	
@@ -52,40 +63,61 @@ package potato.display
 		 * Registers a disposable object.
 		 * @param obj IDisposable 
 		 */
-    public function addDisposable(obj:IDisposable):IDisposable
-    {
-      _disposableChildren.addElement(obj);
-      return obj;
-    }
+		public function addDisposable(obj:IDisposable):IDisposable
+		{
+			_disposableChildren.addElement(obj);
+			return obj;
+		}
 		
 		/**
 		 * Adds and registers a disposable child DisplayObject.
-		 * @param obj IDisposable 
+		 * @param obj IDisposable
+		 * @param params Object [optional] Initialization parameters
 		 */
-	    public function addDisposableChild(obj:IDisposable):DisplayObject
-    {
-      _disposableChildren.addElement(obj);
+		public function addDisposableChild(obj:IDisposable, params:Object = null):DisplayObject
+		{
+			_disposableChildren.addElement(obj);
 
-      var displayObject:DisplayObject = obj as DisplayObject;
-      _removableChildren.push(displayObject);
-      
-      return addChild(displayObject);
-    }
+			var displayObject:DisplayObject = obj as DisplayObject;
+			_removableChildren.push(displayObject);
+
+			if(params != null)
+			{
+				for (var key:String in params) obj[key] = params[key];
+			}
 		
+			return addChild(displayObject);
+		}
+
+		/**
+		 * Adds and registers a child DisplayObject which doesn't implement IDisposable
+		 * @param displayObject DisplayObject
+		 * @param params Object [optional] Initialization parameters
+		 */
+		public function addRemovableChild(displayObject:DisplayObject, params:Object = null):DisplayObject
+		{
+			_removableChildren.push(displayObject);
+			if(params != null)
+			{
+				for (var key:String in params)
+					displayObject[key] = params[key];
+			}
+			return addChild(displayObject);
+		}
+			
 		/**
 		 * Adds and registers a disposable child DisplayObject at the given index.
 		 * @param obj IDisposable
 		 */
-    public function addDisposableChildAt(obj:IDisposable, index:int):DisplayObject
-    {
-      _disposableChildren.addElement(obj);
+		public function addDisposableChildAt(obj:IDisposable, index:int):DisplayObject
+		{
+			_disposableChildren.addElement(obj);
 
-      var displayObject:DisplayObject = obj as DisplayObject;
-      _removableChildren.push(displayObject);
-      
-      return addChildAt(displayObject, index);
-    }
-    
+			var displayObject:DisplayObject = obj as DisplayObject;
+			_removableChildren.push(displayObject);
+			
+			return addChildAt(displayObject, index);
+		}
 	}
 	
 }
