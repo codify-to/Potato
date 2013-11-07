@@ -9,22 +9,35 @@ task_logger = Logger.new File.join(LOG_PATH, "rake.log")
 #Default task
 task :default => [ :build ]
 
+# Production workaround
+productionBuild = false
+
+desc "Production build (debug off)"
+task :production do
+  productionBuild = true
+  Rake::Task[:stop].execute
+  Rake::Task[:build].execute
+end
+
 desc "Build"
 task :build do
 
+  if productionBuild then puts "Starting production build" end
+
   # Command we'll send to the server
   what = config["applications"].map do |v|
-    get_compile_line(v["class"], v["output"], v["exclude"])
+    get_compile_line(v["class"], v["output"], v["exclude"], productionBuild)
   end
 
   server = FCSHDServer.new
   begin
     task_logger.info "Asking server to build: #{what}"
     server.build what
+    if productionBuild then puts "Build complete" end
   rescue Errno::ECONNREFUSED
 
     task_logger.info "Connection refused, trying to start the server"
-    puts "Server is down... starting it up" 
+    puts "Server is down... starting it up"
     `rake '#{__FILE__}' start`
     sleep 2
     Rake::Task[:build].execute
@@ -104,7 +117,7 @@ task :status do
 end
 
 desc "Stops the FCSH server"
-task :stop do 
+task :stop do
   begin
     FCSHDServer.new.stop
     puts "server has stopped"
@@ -123,7 +136,7 @@ end
 
 private
 
-def get_compile_line(input, output, exclude)
+def get_compile_line(input, output, exclude, productionBuild)
 
   # Get libs path (SWC)
   libs_path    = (config["library-path"] || []).map{ |lib| "-library-path+=#{escape(File.join(current_path, lib))}"}.join(" ")
@@ -132,6 +145,9 @@ def get_compile_line(input, output, exclude)
   #Params
   extras = (config['default'][0]['extras'] rescue "")
   debug = (config['default'][0]['debug'] rescue "false")
+
+  if productionBuild then debug = false end
+
   # Generate compilation line
   line = "mxmlc #{escape(File.join(current_path, input))} -o=#{escape(File.join(current_path, output))} -debug=#{debug} #{libs_path} #{sources_path} #{extras}"
 
@@ -191,10 +207,10 @@ def config
   @config ||= YAML.load_file(current_path + "/build.yaml")
 end
 
-# 
+#
 # FCSHDServer
 # Implements a FCSH Server, runs as a daemonized process
-# 
+#
 class FCSHDServer
   PORT = 6924
   HOST = "localhost"
@@ -214,7 +230,7 @@ class FCSHDServer
     #remembering which swfs we asked for compiling
     @commands ||= Hash.new
 
-    #Creating the HTTP Server  
+    #Creating the HTTP Server
     s = WEBrick::HTTPServer.new(
     :Port => PORT,
     :Logger => WEBrick::Log.new(nil, WEBrick::BasicLog::WARN),
@@ -266,7 +282,7 @@ class FCSHDServer
     }
 
     trap("INT"){
-      s.shutdown 
+      s.shutdown
       fcsh.close
     }
 
