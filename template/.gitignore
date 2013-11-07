@@ -1,0 +1,11 @@
+# OSX
+.DS_Store
+
+# Potato
+source/fla/*.swf
+source/fla/RECOVER_*.fla
+source/fla/*.txt
+source/fla/*.html
+source/swc/*.swf
+public/*.swf
+daemons.rb.pid
